@@ -1,0 +1,17 @@
+{
+  "name": "marcs-gale-hub",
+  "version": "1.0.0",
+  "description": "Business intelligence dashboard for marketing agency clients",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Build complete'",
+    "start": "node netlify/functions/api.js"
+  },
+  "keywords": ["dashboard", "news", "intelligence", "marketing"],
+  "author": "Marc Parillo",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "rss-parser": "^3.13.0"
+  }
+}
