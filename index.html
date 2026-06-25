@@ -1,234 +1,744 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marc's GALE Hub</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
-header { background: linear-gradient(135deg, #1e293b, #0f172a); border-bottom: 1px solid #334155; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
-header h1 { font-size: 1.4rem; font-weight: 700; color: #f8fafc; }
-header span { background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-nav { background: #1e293b; border-bottom: 1px solid #334155; padding: 0 24px; display: flex; gap: 4px; overflow-x: auto; }
-nav button { background: none; border: none; color: #94a3b8; padding: 14px 18px; cursor: pointer; font-size: 0.85rem; font-weight: 500; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; }
-nav button:hover { color: #e2e8f0; }
-nav button.active { color: #818cf8; border-bottom-color: #818cf8; }
-.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
-.section { display: none; }
-.section.active { display: block; }
-.section-title { font-size: 1.1rem; font-weight: 600; color: #f1f5f9; margin-bottom: 20px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px; }
-.card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; transition: border-color 0.2s; }
-.card:hover { border-color: #4f46e5; }
-.card-header { padding: 16px; display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #334155; }
-.client-name { font-weight: 600; font-size: 1rem; color: #f1f5f9; }
-.client-meta { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
-.stock-badge { text-align: right; }
-.stock-price { font-size: 1rem; font-weight: 700; color: #f1f5f9; }
-.stock-change { font-size: 0.75rem; font-weight: 600; margin-top: 2px; }
-.stock-change.up { color: #22c55e; }
-.stock-change.down { color: #ef4444; }
-.private-badge { background: #1e3a5f; color: #60a5fa; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
-.card-body { padding: 16px; }
-.subsection-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 10px; margin-top: 14px; }
-.subsection-label:first-child { margin-top: 0; }
-.news-item { padding: 8px 0; border-bottom: 1px solid #263147; }
-.news-item:last-child { border-bottom: none; }
-.news-title a { color: #818cf8; text-decoration: none; font-size: 0.82rem; line-height: 1.4; display: block; }
-.news-title a:hover { text-decoration: underline; }
-.news-meta { font-size: 0.7rem; color: #475569; margin-top: 3px; }
-.loading { color: #475569; font-size: 0.8rem; font-style: italic; padding: 8px 0; }
-.competitors { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-.comp-tag { background: #0f172a; border: 1px solid #334155; color: #64748b; padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; }
-.industry-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-.feed-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; }
-.feed-header { padding: 14px 16px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 10px; }
-.feed-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: white; }
-.feed-name { font-weight: 600; font-size: 0.9rem; }
-.feed-body { padding: 14px 16px; }
-.sector-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-.sector-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.82rem; transition: all 0.2s; }
-.sector-btn:hover { border-color: #6366f1; color: #e2e8f0; }
-.sector-btn.active { background: #4f46e5; border-color: #4f46e5; color: white; }
-.radar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
-.radar-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 16px; }
-.radar-client { font-weight: 600; font-size: 0.9rem; color: #f1f5f9; margin-bottom: 10px; }
-.keyword-highlight { color: #22c55e; font-weight: 600; }
-.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #334155; border-top-color: #818cf8; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; vertical-align: middle; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.avatar { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #4f46e5, #7c3aed); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: white; flex-shrink: 0; }
-.client-info { display: flex; align-items: flex-start; gap: 10px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marc's GALE Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+            color: #e5e7eb;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid #4f8ef7;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #4f8ef7;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(79, 142, 247, 0.5);
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn {
+            background: #4f8ef7;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(79, 142, 247, 0.3);
+        }
+
+        .refresh-btn:hover {
+            background: #3d7ae0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 142, 247, 0.4);
+        }
+
+        .refresh-btn:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: #111827;
+            color: #9ca3af;
+            border: 2px solid transparent;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: #4f8ef7;
+            border-color: #4f8ef7;
+        }
+
+        .tab-btn.active {
+            background: #4f8ef7;
+            color: white;
+            border-color: #4f8ef7;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .client-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .client-card {
+            background: #111827;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #1f2937;
+            transition: all 0.3s;
+        }
+
+        .client-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(79, 142, 247, 0.2);
+            border-color: #4f8ef7;
+        }
+
+        .client-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #374151;
+        }
+
+        .client-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #4f8ef7;
+        }
+
+        .stock-info {
+            text-align: right;
+        }
+
+        .stock-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .stock-change {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .stock-change.positive {
+            color: #10b981;
+        }
+
+        .stock-change.negative {
+            color: #ef4444;
+        }
+
+        .news-section {
+            margin-top: 16px;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .news-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #1f2937;
+            border-radius: 8px;
+            border-left: 3px solid #4f8ef7;
+            transition: all 0.2s;
+        }
+
+        .news-item:hover {
+            background: #374151;
+            transform: translateX(4px);
+        }
+
+        .news-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .news-title a {
+            color: #e5e7eb;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .news-title a:hover {
+            color: #4f8ef7;
+        }
+
+        .news-meta {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+        }
+
+        .spinner {
+            border: 4px solid #1f2937;
+            border-top: 4px solid #4f8ef7;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.9rem;
+            padding: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        .industry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .industry-card {
+            background: #111827;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #1f2937;
+        }
+
+        .industry-card h3 {
+            color: #4f8ef7;
+            margin-bottom: 16px;
+            font-size: 1.3rem;
+        }
+
+        .sector-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: #111827;
+            color: #9ca3af;
+            border: 2px solid #374151;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: #4f8ef7;
+            color: #4f8ef7;
+        }
+
+        .filter-btn.active {
+            background: #4f8ef7;
+            color: white;
+            border-color: #4f8ef7;
+        }
+
+        .competitor-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #374151;
+        }
+
+        .competitor-label {
+            font-size: 0.85rem;
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .client-grid,
+            .industry-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-<header>
-  <h1>&#127970; Marc's GALE Hub</h1>
-  <span>LIVE</span>
-</header>
-<nav>
-  <button class="active" onclick="showSection('portfolio',this)">&#128202; Client Portfolio</button>
-  <button onclick="showSection('trends',this)">&#128200; Industry Trends</button>
-  <button onclick="showSection('sector',this)">&#127919; Sector Intelligence</button>
-  <button onclick="showSection('radar',this)">&#128161; Opportunity Radar</button>
-</nav>
-<div class="container">
-  <div id="portfolio" class="section active">
-    <div class="section-title">&#128202; Client Portfolio Dashboard</div>
-    <div class="grid" id="clientGrid"></div>
-  </div>
-  <div id="trends" class="section">
-    <div class="section-title">&#128200; Marketing Industry Trends</div>
-    <div class="industry-grid" id="trendsGrid"></div>
-  </div>
-  <div id="sector" class="section">
-    <div class="section-title">&#127919; Sector Intelligence</div>
-    <div class="sector-filters">
-      <button class="sector-btn active" onclick="filterSector('all',this)">All Sectors</button>
-      <button class="sector-btn" onclick="filterSector('healthcare',this)">&#127973; Healthcare</button>
-      <button class="sector-btn" onclick="filterSector('hospitality',this)">&#127976; Hospitality</button>
-      <button class="sector-btn" onclick="filterSector('autotech',this)">&#128663; Auto/Tech</button>
-      <button class="sector-btn" onclick="filterSector('food',this)">&#127828; Food &amp; Beverage</button>
+    <div class="container">
+        <header>
+            <h1>🎯 Marc's GALE Hub</h1>
+            <p class="subtitle">Real-time Client Intelligence Dashboard</p>
+        </header>
+
+        <div class="controls">
+            <button class="refresh-btn" onclick="refreshAllData()">🔄 Refresh All Data</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('portfolio')">Client Portfolio</button>
+            <button class="tab-btn" onclick="switchTab('trends')">Industry Trends</button>
+            <button class="tab-btn" onclick="switchTab('sector')">Sector Intelligence</button>
+            <button class="tab-btn" onclick="switchTab('opportunities')">Opportunity Radar</button>
+        </div>
+
+        <div id="portfolio" class="tab-content active">
+            <div class="client-grid" id="clientGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading client data...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="trends" class="tab-content">
+            <div class="industry-grid" id="trendsGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading industry trends...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="sector" class="tab-content">
+            <div class="sector-filters">
+                <button class="filter-btn active" onclick="filterSector('all')">All Sectors</button>
+                <button class="filter-btn" onclick="filterSector('healthcare')">Healthcare</button>
+                <button class="filter-btn" onclick="filterSector('hospitality')">Hospitality</button>
+                <button class="filter-btn" onclick="filterSector('autotech')">Auto/Tech</button>
+                <button class="filter-btn" onclick="filterSector('foodbev')">Food & Beverage</button>
+            </div>
+            <div class="client-grid" id="sectorGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading sector intelligence...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="opportunities" class="tab-content">
+            <div class="industry-grid" id="opportunitiesGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading opportunities...</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="grid" id="sectorGrid"></div>
-  </div>
-  <div id="radar" class="section">
-    <div class="section-title">&#128161; Opportunity Radar</div>
-    <div class="radar-grid" id="radarGrid"></div>
-  </div>
-</div>
-<script>
-const PROXY='https://api.allorigins.win/get?url=';
-const FINNHUB='d8ta1ihr01qhcnk113qgd8ta1ihr01qhcnk113r0';
-const CLIENTS=[
-  {name:'Athenahealth',ticker:null,sector:'healthcare',competitors:['Epic Systems','Cerner','Allscripts'],initials:'A'},
-  {name:'Embrace Pet Insurance',ticker:null,sector:'healthcare',competitors:['Trupanion','Healthy Paws','Pets Best'],initials:'EP'},
-  {name:'Pets Best Insurance',ticker:null,sector:'healthcare',competitors:['Trupanion','Healthy Paws','Embrace'],initials:'PB'},
-  {name:'HealthEquity',ticker:'HQY',sector:'healthcare',competitors:['HSA Bank','Lively','Optum Bank'],initials:'H'},
-  {name:'InterContinental Hotels Group',ticker:'IHG',sector:'hospitality',competitors:['Marriott','Hilton','Hyatt'],initials:'IH'},
-  {name:'Waymo',ticker:null,sector:'autotech',competitors:['Cruise','Aurora Innovation','Tesla FSD'],initials:'W'},
-  {name:'Cava',ticker:'CAVA',sector:'food',competitors:['Sweetgreen','Chipotle','Zoes Kitchen'],initials:'C'},
-  {name:'Shake Shack',ticker:'SHAK',sector:'food',competitors:['Five Guys','Smashburger','BurgerFi'],initials:'SS'}
-];
-const FEEDS=[
-  {name:'Ad Age',url:'https://adage.com/feed',color:'#ef4444',icon:'AA'},
-  {name:'Digiday',url:'https://digiday.com/feed',color:'#f97316',icon:'DG'},
-  {name:'Marketing Dive',url:'https://www.marketingdive.com/feeds/news/',color:'#3b82f6',icon:'MD'},
-  {name:'The Drum',url:'https://www.thedrum.com/rss',color:'#8b5cf6',icon:'TD'},
-  {name:'Marketing Week',url:'https://www.marketingweek.com/feed/',color:'#22c55e',icon:'MW'},
-  {name:'MediaPost',url:'https://www.mediapost.com/rss.cfm',color:'#ec4899',icon:'MP'}
-];
-function showSection(id,btn){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
-}
-function timeAgo(ds){
-  if(!ds)return'';
-  const d=new Date(ds);
-  if(isNaN(d))return'';
-  const diff=(Date.now()-d)/1000;
-  if(diff<3600)return Math.floor(diff/60)+'m ago';
-  if(diff<86400)return Math.floor(diff/3600)+'h ago';
-  return Math.floor(diff/86400)+'d ago';
-}
-async function fetchRSS(url,max=4){
-  try{
-    const res=await fetch(PROXY+encodeURIComponent(url));
-    const data=await res.json();
-    const parser=new DOMParser();
-    const xml=parser.parseFromString(data.contents,'text/xml');
-    const items=xml.querySelectorAll('item');
-    return Array.from(items).slice(0,max).map(item=>{
-      let link=item.querySelector('link')?.textContent?.trim()||'';
-      if(!link){const l=item.getElementsByTagName('link')[0];link=l?.getAttribute('href')||l?.textContent?.trim()||'#';}
-      return{
-        title:(item.querySelector('title')?.textContent||'').replace(/^<!\[CDATA\[/,'').replace(/\]\]>$/,'').trim()||'No title',
-        link:link||'#',
-        pubDate:item.querySelector('pubDate')?.textContent||''
-      };
-    });
-  }catch(e){return[];}
-}
-async function fetchStock(ticker){
-  try{
-    const r=await fetch('https://finnhub.io/api/v1/quote?symbol='+ticker+'&token='+FINNHUB);
-    const d=await r.json();
-    return{price:d.c?.toFixed(2),change:d.dp?.toFixed(2)};
-  }catch(e){return null;}
-}
-function newsHTML(items){
-  if(!items||items.length===0)return'<div class="news-item"><span style="color:#475569;font-size:0.8rem">No recent news found</span></div>';
-  return items.map(i=>'<div class="news-item"><div class="news-title"><a href="'+i.link+'" target="_blank">'+i.title+'</a></div><div class="news-meta">'+timeAgo(i.pubDate)+'</div></div>').join('');
-}
-async function buildPortfolio(){
-  const grid=document.getElementById('clientGrid');
-  for(const c of CLIENTS){
-    const card=document.createElement('div');
-    card.className='card';
-    const sid='s'+c.name.replace(/[^a-z0-9]/gi,'');
-    const stockH=c.ticker
-      ?'<div class="stock-badge"><div class="stock-price" id="p'+c.ticker+'">...</div><div class="stock-change" id="ch'+c.ticker+'"></div></div>'
-      :'<span class="private-badge">Private</span>';
-    card.innerHTML='<div class="card-header"><div class="client-info"><div class="avatar">'+c.initials+'</div><div><div class="client-name">'+c.name+'</div><div class="client-meta">'+(c.ticker?'&#128200; '+c.ticker:'&#127970; Private')+'</div></div></div>'+stockH+'</div><div class="card-body"><div class="subsection-label">Client News</div><div id="cn'+sid+'"><span class="spinner"></span></div><div class="subsection-label">Competitors</div><div class="competitors">'+c.competitors.map(x=>'<span class="comp-tag">'+x+'</span>').join('')+'</div><div class="subsection-label">Competitor News</div><div id="co'+sid+'"><span class="spinner"></span></div></div>';
-    grid.appendChild(card);
-    if(c.ticker)fetchStock(c.ticker).then(s=>{if(s&&s.price){document.getElementById('p'+c.ticker).textContent='$'+s.price;const el=document.getElementById('ch'+c.ticker);el.textContent=(s.change>=0?'&#9650; ':'&#9660; ')+Math.abs(s.change)+'%';el.className='stock-change '+(s.change>=0?'up':'down');}});
-    fetchRSS('https://news.google.com/rss/search?q='+encodeURIComponent(c.name)+'&hl=en-US&gl=US&ceid=US:en',3).then(items=>{document.getElementById('cn'+sid).innerHTML=newsHTML(items);});
-    fetchRSS('https://news.google.com/rss/search?q='+encodeURIComponent(c.competitors[0])+'&hl=en-US&gl=US&ceid=US:en',3).then(items=>{document.getElementById('co'+sid).innerHTML=newsHTML(items);});
-  }
-}
-async function buildTrends(){
-  const grid=document.getElementById('trendsGrid');
-  for(const f of FEEDS){
-    const card=document.createElement('div');
-    card.className='feed-card';
-    const uid='f'+f.name.replace(/[^a-z0-9]/gi,'');
-    card.innerHTML='<div class="feed-header"><div class="feed-icon" style="background:'+f.color+'">'+f.icon+'</div><span class="feed-name">'+f.name+'</span></div><div class="feed-body"><div id="'+uid+'"><span class="spinner"></span></div></div>';
-    grid.appendChild(card);
-    fetchRSS(f.url,5).then(items=>{document.getElementById(uid).innerHTML=newsHTML(items);});
-  }
-}
-function getSectorLabel(s){return{healthcare:'&#127973; Healthcare',hospitality:'&#127976; Hospitality',autotech:'&#128663; Auto/Tech',food:'&#127828; Food & Beverage'}[s]||s;}
-function getSectorKw(s){return{healthcare:'healthcare fintech insurance',hospitality:'hotel hospitality travel',autotech:'autonomous vehicle self-driving tech',food:'restaurant fast casual food'}[s]||'';}
-async function buildSector(){
-  const grid=document.getElementById('sectorGrid');
-  for(const c of CLIENTS){
-    const card=document.createElement('div');
-    card.className='card';
-    card.dataset.sector=c.sector;
-    const uid='sec'+c.name.replace(/[^a-z0-9]/gi,'');
-    card.innerHTML='<div class="card-header"><div class="client-info"><div class="avatar">'+c.initials+'</div><div><div class="client-name">'+c.name+'</div><div class="client-meta">'+getSectorLabel(c.sector)+'</div></div></div></div><div class="card-body"><div id="'+uid+'"><span class="spinner"></span></div></div>';
-    grid.appendChild(card);
-    fetchRSS('https://news.google.com/rss/search?q='+encodeURIComponent(c.name+' '+getSectorKw(c.sector))+'&hl=en-US&gl=US&ceid=US:en',4).then(items=>{document.getElementById(uid).innerHTML=newsHTML(items);});
-  }
-}
-function filterSector(sector,btn){
-  document.querySelectorAll('.sector-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('#sectorGrid .card').forEach(card=>{card.style.display=(sector==='all'||card.dataset.sector===sector)?'':'none';});
-}
-async function buildRadar(){
-  const grid=document.getElementById('radarGrid');
-  const kws=['cmo','marketing','budget','launch','campaign','spend','hire','expand','acquisition'];
-  for(const c of CLIENTS){
-    const card=document.createElement('div');
-    card.className='radar-card';
-    const uid='rad'+c.name.replace(/[^a-z0-9]/gi,'');
-    card.innerHTML='<div class="radar-client">&#128161; '+c.name+'</div><div id="'+uid+'"><span class="spinner"></span></div>';
-    grid.appendChild(card);
-    fetchRSS('https://news.google.com/rss/search?q='+encodeURIComponent(c.name+' marketing launch expansion')+'&hl=en-US&gl=US&ceid=US:en',3).then(items=>{
-      const el=document.getElementById(uid);
-      if(!items||items.length===0){el.innerHTML='<span style="color:#475569;font-size:0.8rem">No signals detected</span>';return;}
-      el.innerHTML=items.map(i=>{
-        let t=i.title;
-        kws.forEach(k=>{t=t.replace(new RegExp('('+k+')','gi'),'<span class="keyword-highlight">$1</span>');});
-        return'<div class="news-item"><div class="news-title"><a href="'+i.link+'" target="_blank">'+t+'</a></div><div class="news-meta">'+timeAgo(i.pubDate)+'</div></div>';
-      }).join('');
-    });
-  }
-}
-buildPortfolio();buildTrends();buildSector();buildRadar();
-</script>
+
+    <script>
+        const FINNHUB_API_KEY = 'd8ta1ihr01qhcnk113qgd8ta1ihr01qhcnk113r0';
+        const RSS2JSON_API = 'https://api.rss2json.com/v1/api.json?rss_url=';
+
+        const clients = [
+            {
+                name: 'Athenahealth',
+                query: 'Athenahealth',
+                stock: null,
+                sector: 'healthcare',
+                competitors: ['Epic Systems', 'Cerner', 'Allscripts']
+            },
+            {
+                name: 'Embrace Pet Insurance',
+                query: 'Embrace Pet Insurance',
+                stock: null,
+                sector: 'healthcare',
+                competitors: ['Trupanion', 'Healthy Paws', 'Pets Best']
+            },
+            {
+                name: 'Pets Best Insurance',
+                query: 'Pets Best Insurance',
+                stock: null,
+                sector: 'healthcare',
+                competitors: ['Trupanion', 'Healthy Paws', 'Embrace']
+            },
+            {
+                name: 'HealthEquity',
+                query: 'HealthEquity',
+                stock: 'HQY',
+                sector: 'healthcare',
+                competitors: ['HSA Bank', 'Lively', 'Optum']
+            },
+            {
+                name: 'InterContinental Hotels Group',
+                query: 'InterContinental Hotels IHG',
+                stock: 'IHG',
+                sector: 'hospitality',
+                competitors: ['Marriott', 'Hilton', 'Hyatt']
+            },
+            {
+                name: 'Waymo',
+                query: 'Waymo',
+                stock: null,
+                sector: 'autotech',
+                competitors: ['Cruise', 'Aurora Innovation', 'Tesla FSD']
+            },
+            {
+                name: 'Cava',
+                query: 'Cava restaurant',
+                stock: 'CAVA',
+                sector: 'foodbev',
+                competitors: ['Sweetgreen', 'Chipotle', 'Panera']
+            },
+            {
+                name: 'Shake Shack',
+                query: 'Shake Shack',
+                stock: 'SHAK',
+                sector: 'foodbev',
+                competitors: ['Five Guys', 'Smashburger', 'BurgerFi']
+            }
+        ];
+
+        const industryFeeds = [
+            { name: 'Ad Age', url: 'https://adage.com/feed' },
+            { name: 'Digiday', url: 'https://digiday.com/feed' },
+            { name: 'Marketing Dive', url: 'https://www.marketingdive.com/feeds/news/' }
+        ];
+
+        const opportunityQueries = [
+            'CMO hire 2025',
+            'Chief Marketing Officer appointment',
+            'marketing budget increase 2025',
+            'new product launch',
+            'brand relaunch',
+            'marketing leadership change'
+        ];
+
+        let clientData = [];
+        let currentSectorFilter = 'all';
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'trends' && document.getElementById('trendsGrid').innerHTML.includes('Loading')) {
+                loadIndustryTrends();
+            } else if (tabName === 'opportunities' && document.getElementById('opportunitiesGrid').innerHTML.includes('Loading')) {
+                loadOpportunities();
+            }
+        }
+
+        async function fetchNews(query, maxItems = 4) {
+            try {
+                const googleNewsUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
+                const response = await fetch(RSS2JSON_API + encodeURIComponent(googleNewsUrl));
+                const data = await response.json();
+                
+                if (data.status === 'ok' && data.items) {
+                    return data.items.slice(0, maxItems).map(item => ({
+                        title: item.title,
+                        link: item.link,
+                        source: item.author || 'Google News',
+                        date: new Date(item.pubDate).toLocaleDateString()
+                    }));
+                }
+                return [];
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                return [];
+            }
+        }
+
+        async function fetchRSSFeed(feedUrl, maxItems = 8) {
+            try {
+                const response = await fetch(RSS2JSON_API + encodeURIComponent(feedUrl));
+                const data = await response.json();
+                
+                if (data.status === 'ok' && data.items) {
+                    return data.items.slice(0, maxItems).map(item => ({
+                        title: item.title,
+                        link: item.link,
+                        source: data.feed.title || 'RSS Feed',
+                        date: new Date(item.pubDate).toLocaleDateString()
+                    }));
+                }
+                return [];
+            } catch (error) {
+                console.error('Error fetching RSS feed:', error);
+                return [];
+            }
+        }
+
+        async function fetchStockPrice(symbol) {
+            try {
+                const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`);
+                const data = await response.json();
+                
+                if (data.c && data.dp !== undefined) {
+                    return {
+                        price: data.c.toFixed(2),
+                        change: data.dp.toFixed(2),
+                        isPositive: data.dp >= 0
+                    };
+                }
+                return null;
+            } catch (error) {
+                console.error('Error fetching stock price:', error);
+                return null;
+            }
+        }
+
+        function renderNewsItems(newsItems, isCompetitor = false) {
+            if (!newsItems || newsItems.length === 0) {
+                return '<div class="error-message">No news available</div>';
+            }
+
+            return newsItems.map(item => `
+                <div class="news-item">
+                    ${isCompetitor ? '<div class="competitor-label">COMPETITOR</div>' : ''}
+                    <div class="news-title">
+                        <a href="${item.link}" target="_blank">${item.title}</a>
+                    </div>
+                    <div class="news-meta">${item.source} • ${item.date}</div>
+                </div>
+            `).join('');
+        }
+
+        async function loadClientPortfolio() {
+            const grid = document.getElementById('clientGrid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading client data...</p></div>';
+
+            clientData = [];
+
+            for (const client of clients) {
+                const newsPromise = fetchNews(client.query, 4);
+                const stockPromise = client.stock ? fetchStockPrice(client.stock) : Promise.resolve(null);
+                const competitorNewsPromises = client.competitors.map(comp => fetchNews(comp, 2));
+
+                const [news, stock, ...competitorNews] = await Promise.all([
+                    newsPromise,
+                    stockPromise,
+                    ...competitorNewsPromises
+                ]);
+
+                clientData.push({
+                    ...client,
+                    news,
+                    stock,
+                    competitorNews: competitorNews.flat()
+                });
+            }
+
+            renderClientGrid();
+        }
+
+        function renderClientGrid() {
+            const grid = document.getElementById('clientGrid');
+            
+            grid.innerHTML = clientData.map(client => `
+                <div class="client-card">
+                    <div class="client-header">
+                        <div class="client-name">${client.name}</div>
+                        ${client.stock ? `
+                            <div class="stock-info">
+                                <div class="stock-price">$${client.stock.price || '--'}</div>
+                                <div class="stock-change ${client.stock.isPositive ? 'positive' : 'negative'}">
+                                    ${client.stock.isPositive ? '▲' : '▼'} ${Math.abs(client.stock.change)}%
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="news-section">
+                        <div class="section-title">Latest News</div>
+                        ${renderNewsItems(client.news)}
+                    </div>
+
+                    ${client.competitorNews && client.competitorNews.length > 0 ? `
+                        <div class="competitor-section">
+                            <div class="section-title">Competitor Activity</div>
+                            ${renderNewsItems(client.competitorNews.slice(0, 3), true)}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        async function loadIndustryTrends() {
+            const grid = document.getElementById('trendsGrid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading industry trends...</p></div>';
+
+            const trendsData = [];
+
+            for (const feed of industryFeeds) {
+                const news = await fetchRSSFeed(feed.url, 8);
+                trendsData.push({
+                    name: feed.name,
+                    news
+                });
+            }
+
+            grid.innerHTML = trendsData.map(source => `
+                <div class="industry-card">
+                    <h3>${source.name}</h3>
+                    ${renderNewsItems(source.news)}
+                </div>
+            `).join('');
+        }
+
+        function filterSector(sector) {
+            currentSectorFilter = sector;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderSectorGrid();
+        }
+
+        function renderSectorGrid() {
+            const grid = document.getElementById('sectorGrid');
+            
+            let filteredClients = clientData;
+            if (currentSectorFilter !== 'all') {
+                filteredClients = clientData.filter(c => c.sector === currentSectorFilter);
+            }
+
+            if (filteredClients.length === 0) {
+                grid.innerHTML = '<div class="loading"><p>No clients in this sector</p></div>';
+                return;
+            }
+
+            grid.innerHTML = filteredClients.map(client => `
+                <div class="client-card">
+                    <div class="client-header">
+                        <div class="client-name">${client.name}</div>
+                        <div style="color: #9ca3af; font-size: 0.9rem; text-transform: uppercase;">
+                            ${client.sector}
+                        </div>
+                    </div>
+                    
+                    <div class="news-section">
+                        <div class="section-title">Sector News</div>
+                        ${renderNewsItems(client.news)}
+                    </div>
+
+                    <div class="competitor-section">
+                        <div class="section-title">Key Competitors: ${client.competitors.join(', ')}</div>
+                        ${client.competitorNews ? renderNewsItems(client.competitorNews.slice(0, 2), true) : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadOpportunities() {
+            const grid = document.getElementById('opportunitiesGrid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading opportunities...</p></div>';
+
+            const opportunities = [];
+
+            for (const query of opportunityQueries) {
+                const news = await fetchNews(query, 6);
+                opportunities.push({
+                    category: query,
+                    news
+                });
+            }
+
+            grid.innerHTML = opportunities.map(opp => `
+                <div class="industry-card">
+                    <h3>🎯 ${opp.category}</h3>
+                    ${renderNewsItems(opp.news)}
+                </div>
+            `).join('');
+        }
+
+        async function refreshAllData() {
+            const btn = document.querySelector('.refresh-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Refreshing...';
+
+            await loadClientPortfolio();
+            
+            // Reset other tabs to reload on next view
+            document.getElementById('trendsGrid').innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading industry trends...</p></div>';
+            document.getElementById('opportunitiesGrid').innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading opportunities...</p></div>';
+
+            btn.disabled = false;
+            btn.textContent = '🔄 Refresh All Data';
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadClientPortfolio();
+        });
+    </script>
 </body>
 </html>
